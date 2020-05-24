@@ -12,8 +12,9 @@ class ExcelTemplate(object):
         self.wb = load_workbook(filename)
         self.wbv = load_workbook(filename, data_only=True)
         self.original_dimensions = dict((ws.title, (ws.max_row, ws.max_column)) for ws in self.wb.worksheets)
-        self.updated_dimensions = {}
-        self.cell_dimensions = dict((ws.title, (1,1)) for ws in self.wb.worksheets)
+        self.updated_dimensions = dict((ws.title, (ws.max_row, ws.max_column)) for ws in self.wb.worksheets)
+        self.grid_dimensions = dict((ws.title, (1,1)) for ws in self.wb.worksheets)
+        self.tiled_sheets = set()
 
     def copy_worksheet(self, source_name, target_name):
         """
@@ -31,8 +32,8 @@ class ExcelTemplate(object):
         target.title = target_name
 
         self.original_dimensions[target_name] = self.original_dimensions[source_name]
-        self.updated_dimensions[target_name] = self.updated_dimensions.get(source_name)
-        self.cell_dimensions[target_name] = self.cell_dimensions[source_name]
+        self.updated_dimensions[target_name] = self.updated_dimensions[source_name]
+        self.grid_dimensions[target_name] = self.grid_dimensions[source_name]
 
     def tile(self, sheetname, rows, columns, row_spacing=1, col_spacing=1):
         """
@@ -46,8 +47,9 @@ class ExcelTemplate(object):
         :return:
         """
 
-        if sheetname in self.updated_dimensions:
+        if sheetname in self.tiled_sheets:
             raise Exception("Can only expand the sheet '{sheet}' once".format(sheet=sheetname))
+        self.tiled_sheets.add(sheetname)
 
         ws = self.wb[sheetname]
         rng = ws[ws.dimensions]
@@ -55,7 +57,7 @@ class ExcelTemplate(object):
         row_offset = ws.max_row + row_spacing
         col_offset = ws.max_column + col_spacing
         self.updated_dimensions[sheetname] = (row_offset, col_offset)
-        self.cell_dimensions[sheetname] = (rows, columns)
+        self.grid_dimensions[sheetname] = (rows, columns)
 
         merged_cells = [(r.min_row, r.min_col, r.max_row, r.max_col) for r in ws.merged_cells.ranges]
 
@@ -108,7 +110,7 @@ class ExcelTemplate(object):
         :return:
         """
 
-        if grid_row > self.cell_dimensions[sheetname][0] or grid_col > self.cell_dimensions[sheetname][1]:
+        if grid_row > self.grid_dimensions[sheetname][0] or grid_col > self.grid_dimensions[sheetname][1]:
             raise Exception("Invalid cell position (%d, %d)" % (grid_row, grid_col))
         ws = self.wb[sheetname]
         row_offset, col_offset = self.updated_dimensions.get(sheetname, self.original_dimensions[sheetname])
@@ -138,6 +140,6 @@ def make_dict(df, keys, value, sep):
     :return: a dictionary
     """
     d = {}
-    for i, row in df.iterrows():
-        d[sep.join([str(row[key]) for key in keys])] = row[value]
+    for key, value in zip(df[keys].astype(str).apply(lambda row: sep.join(row.values), axis=1), df[value]):
+        d[key] = value
     return d
