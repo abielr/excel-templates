@@ -12,7 +12,7 @@ pip install excel_templates
 ### Basic usage
 Suppose we've created a financial statement template in Excel, such as the one in the image below which shows quarterly revenue, expenses, and profits for a particular product and region combination.
 
-![Blank Template](https://github.com/abielr/excel-templates/doc/images/template_blank.png)
+![Blank Template](https://github.com/abielr/excel-templates/blob/master/doc/images/template_blank.png)
 
 Notice that the Revenue and Expense cells of the table have been filled in with unique key that is the combination of the line item and period name. This can be created manually or as an Excel formula. The Profit line is an Excel formula that is equal to Revenue - Expense; it currently shows a `#VALUE!` error since the cells that it references have not been populated with numbers.
 
@@ -29,7 +29,7 @@ template.save('output.xlsx')
 
 Now `output.xlsx` will contain a table that looks like the following:
 
-![Template1](https://github.com/abielr/excel-templates/doc/images/template1.png)
+![Template1](https://github.com/abielr/excel-templates/blob/master/doc/images/template1.png)
 
 Typically your raw data will already reside in a `pandas DataFrame` object. The package provides a helper function called `make_dict` to quickly concatenate columns in a `DataFrame` and translate it into a dictionary object. In the example below we simulate some data with multiple products and regions, then fill in the table with the data for a single product/region combination.
 
@@ -63,7 +63,7 @@ template.save('output.xlsx')
 
 This produces the following output
 
-![Template2](https://github.com/abielr/excel-templates/doc/images/template2.png)<br/><br/>
+![Template2](https://github.com/abielr/excel-templates/blob/master/doc/images/template2.png) <br/><br/>
 
 ### Tiling templates
 The simulated data above has two products and two regions, so let's tile the table into a 2x2 grid with products across the columns and regions down the rows. Continuing with the same simulated data as before:
@@ -86,7 +86,7 @@ template.save("output.xlsx")
 
 The first column of output is shown below, the second column would look similar but with the other product. By default there is one blank row and column between the tiled tables, this can be adjusted with the `row_spacing` and `col_spacing` arguments to `tile()`.
 
-![Template3](https://github.com/abielr/excel-templates/doc/images/template3.png)<br/><br/>
+![Template3](https://github.com/abielr/excel-templates/blob/master/doc/images/template3.png) <br/><br/>
 
 ### Blank cells
 
@@ -104,7 +104,7 @@ template.fill("Sheet1", data=data, fillna=0, prefix='//')
 
 Note that the prefix, which in this case is `//`, is stripped from the Excel values before they are compared to keys in `data`, i.e. the value `//Revenue/Q4` in Excel will be substituted with the value whose key is `Revenue/Q4` in `data`. The image below shows the output when the Q4 data is missing.
 
-![Filled Template](https://github.com/abielr/excel-templates/doc/images/template_filled.png)<br/><br/>
+![Filled Template](https://github.com/abielr/excel-templates/blob/master/doc/images/template_filled.png) <br/><br/>
 
 ### Copying worksheets
 
