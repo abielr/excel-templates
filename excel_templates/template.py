@@ -27,6 +27,7 @@ class ExcelTemplate(object):
 
         target = self.wb.copy_worksheet(self.wb[source_name])
         target.title = target_name
+        target.freeze_panes = self.wb[source_name].freeze_panes
 
         target = self.wbv.copy_worksheet(self.wbv[source_name])
         target.title = target_name
